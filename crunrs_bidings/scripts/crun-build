@@ -1,0 +1,34 @@
+#!/bin/bash
+
+CRUN_GIT_URL='https://github.com/containers/crun.git'
+CRUN_GIT_REFS='main'
+DEST_DIR='external/crun'
+
+crun_fetch() {
+  if [ -d ${DEST_DIR} ]; then
+    rm -rf ${DEST_DIR}
+  fi
+
+  git clone ${CRUN_GIT_URL} ${DEST_DIR}
+
+  (
+    cd ${DEST_DIR};
+    git checkout -b ${CRUN_GIT_REFS};
+    git reset --hard ${CRUN_GIT_REFS};
+  )
+}
+
+crun_build() {
+  (
+    cd ${DEST_DIR};
+    ./autogen.sh;
+    ./configure --enable-shared;
+    make)
+}
+
+crun_main() {
+  crun_fetch
+  crun_build
+}
+
+crun_main
